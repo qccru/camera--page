@@ -1,0 +1,64 @@
+<button id="startButton">السماح بالكاميرا</button>
+
+<button id="captureButton" disabled>
+  التقاط الصورة
+</button>
+
+<script>
+const video = document.getElementById("video");
+const startButton = document.getElementById("startButton");
+const captureButton = document.getElementById("captureButton");
+
+let stream;
+
+startButton.onclick = async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "user"
+      },
+      audio: false
+    });
+
+    video.srcObject = stream;
+
+    startButton.style.display = "none";
+    captureButton.disabled = false;
+
+  } catch (error) {
+    alert("يجب السماح باستخدام الكاميرا أولاً.");
+  }
+};
+
+captureButton.onclick = () => {
+  const canvas = document.createElement("canvas");
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const ctx = canvas.getContext("2d");
+
+  ctx.drawImage(
+    video,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  const image = canvas.toDataURL("image/jpeg", 0.9);
+
+  // هنا أصبحت الصورة موجودة في المتغير image
+  console.log(image);
+
+  stream.getTracks().forEach(track => track.stop());
+
+  captureButton.disabled = true;
+};
+</script>
+<video
+  id="video"
+  autoplay
+  playsinline
+  style="width:100%; max-width:500px;">
+</video>
